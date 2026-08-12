@@ -6,6 +6,8 @@ def supervisor(state: MedicalState) -> dict:
     """
     if not state.get("diagnostic_summary"):
         next_node = "diagnostic_agent"
+    elif not state.get("interim_care"):
+        next_node = "interim_care_agent"
     elif not state.get("physician_treatment"):
         next_node = "physician_review"
     elif not state.get("final_report"):

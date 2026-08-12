@@ -10,6 +10,7 @@ class MedicalState(TypedDict, total = False):
 
     next: Literal[
         "diagnostic_agent",
+        "interim_care_agent",
         "physician_review",
         "report_agent",
         "FINISH"
@@ -20,7 +21,7 @@ class MedicalState(TypedDict, total = False):
     patient_answers: list[dict[str,str]]
 
     diagnostic_summary: dict[str, object]
-    interim_care: str
+    interim_care: dict[str, object]
 
     physician_treatment: str
     physician_notes: str

@@ -1,7 +1,11 @@
-from backend.app.graph import graph
+import asyncio
+
 from langgraph.types import Command
 
-def main():
+from backend.app.graph import graph
+
+
+async def main():
     config = {
         "configurable": {
             "thread_id": "test-consultation-1",
@@ -17,11 +21,10 @@ def main():
         "patient_answers": [],
     }
 
-    result = graph.invoke(initial_state, config=config)
+    result = await graph.ainvoke(initial_state, config=config)
 
     while result.get("__interrupt__"):
-        interruption = result["__interrupt__"][0]
-        payload = interruption.value
+        payload = result["__interrupt__"][0].value
 
         if payload["type"] == "patient_question":
             print(f"\nQuestion: {payload['question']}")
@@ -29,7 +32,10 @@ def main():
 
         elif payload["type"] == "physician_review":
             print("\n--- PHYSICIAN REVIEW ---")
+            print("Clinical summary:")
             print(payload["diagnostic_summary"])
+            print("\nMCP interim care:")
+            print(payload["interim_care"])
 
             treatment = input("\nTreatment or course of action: ")
             notes = input("Additional physician notes: ")
@@ -40,9 +46,11 @@ def main():
             }
 
         else:
-            raise ValueError(f"Unknown interruption type: {payload['type']}")
+            raise ValueError(
+                f"Unknown interruption type: {payload['type']}"
+            )
 
-        result = graph.invoke(
+        result = await graph.ainvoke(
             Command(resume=response),
             config=config,
         )
@@ -51,4 +59,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
