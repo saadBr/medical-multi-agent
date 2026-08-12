@@ -1,6 +1,10 @@
 from backend.app.state import MedicalState
 from backend.app.tools.patient_tools import ask_patient
 
+from langchain_core.messages import HumanMessage, SystemMessage
+
+from backend.app.llm import llm
+from backend.app.schemas import ClinicalSummary
 
 QUESTIONS = [
     "When did your symptoms begin?",
@@ -38,10 +42,30 @@ def diagnostic_agent(state: MedicalState) -> dict:
         f"- {item['question']} {item['answer']}"
         for item in state.get("patient_answers", [])
     )
+    structured_llm = llm.with_structured_output(ClinicalSummary)
 
-    summary = (
-        f"Initial case: {state.get('initial_case', '')}\n"
-        f"Patient responses:\n{answers_text}"
+    summary = structured_llm.invoke(
+        [
+            SystemMessage(
+                content=(
+                    "You are part of an academic clinical-orientation system. "
+                    "Create only a cautious preliminary clinical summary. "
+                    "Do not provide a definitive diagnosis. "
+                    "Use only information explicitly provided by the patient. "
+                    "Do not invent symptoms, history, allergies, or warning signs."
+                    "Only include positively reported warning signs in warning_signs. "
+                    "Never include symptoms that the patient explicitly denied. "
+                    "Only include positively reported conditions or allergies in relevant_history. "
+                    "Return an empty list when the patient reports none. "
+                )
+            ),
+            HumanMessage(
+                content=(
+                    f"Initial case:\n{state.get('initial_case', '')}\n\n"
+                    f"Patient responses:\n{answers_text}"
+                )
+            ),
+        ]
     )
 
-    return {"diagnostic_summary": summary}
+    return {"diagnostic_summary": summary.model_dump(),}
