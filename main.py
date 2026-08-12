@@ -23,11 +23,27 @@ def main():
         interruption = result["__interrupt__"][0]
         payload = interruption.value
 
-        print(f"\nQuestion: {payload['question']}")
-        answer = input("Your answer: ")
+        if payload["type"] == "patient_question":
+            print(f"\nQuestion: {payload['question']}")
+            response = input("Your answer: ")
+
+        elif payload["type"] == "physician_review":
+            print("\n--- PHYSICIAN REVIEW ---")
+            print(payload["diagnostic_summary"])
+
+            treatment = input("\nTreatment or course of action: ")
+            notes = input("Additional physician notes: ")
+
+            response = {
+                "treatment": treatment,
+                "notes": notes,
+            }
+
+        else:
+            raise ValueError(f"Unknown interruption type: {payload['type']}")
 
         result = graph.invoke(
-            Command(resume=answer),
+            Command(resume=response),
             config=config,
         )
 
