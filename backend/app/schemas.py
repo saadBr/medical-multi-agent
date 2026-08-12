@@ -33,3 +33,20 @@ class ClinicalSummary(BaseModel):
     preliminary_orientation: str = Field(
         description="A cautious preliminary clinical orientation, not a diagnosis."
     )
+class SessionResponse(BaseModel):
+    thread_id: str
+
+
+class ConsultationStartRequest(BaseModel):
+    thread_id: str
+    initial_case: str = Field(min_length=10)
+
+
+class PhysicianReviewInput(BaseModel):
+    treatment: str = Field(min_length=1)
+    notes: str = ""
+
+
+class ConsultationResumeRequest(BaseModel):
+    thread_id: str
+    response: str | PhysicianReviewInput
