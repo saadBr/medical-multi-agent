@@ -1,5 +1,5 @@
 from backend.app.graph import graph
-
+from langgraph.types import Command
 
 def main():
     config = {
@@ -19,7 +19,19 @@ def main():
 
     result = graph.invoke(initial_state, config=config)
 
-    print(result["final_report"])
+    while result.get("__interrupt__"):
+        interruption = result["__interrupt__"][0]
+        payload = interruption.value
+
+        print(f"\nQuestion: {payload['question']}")
+        answer = input("Your answer: ")
+
+        result = graph.invoke(
+            Command(resume=answer),
+            config=config,
+        )
+
+    print("\n" + result["final_report"])
 
 
 if __name__ == "__main__":

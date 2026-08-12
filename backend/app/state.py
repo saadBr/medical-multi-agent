@@ -17,7 +17,7 @@ class MedicalState(TypedDict, total = False):
 
     question_count: int
     current_question: str
-    patient_answer: list[dict[str,str]]
+    patient_answers: list[dict[str,str]]
 
     diagnostic_summary: str
     interim_care: str
