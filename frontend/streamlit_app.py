@@ -66,7 +66,7 @@ def resume_consultation(response):
     st.session_state.status = data["status"]
     st.session_state.pending_interrupt = data["pending_interrupt"]
 
-def get_final_report() -> str:
+def get_final_report() -> dict:
     with httpx.Client(timeout=60) as client:
         response = client.get(
             f"{API_URL}/consultation/"
@@ -165,11 +165,65 @@ elif st.session_state.status == "waiting_for_physician":
     st.caption(f"Consultation ID: {st.session_state.thread_id}")
 
 elif st.session_state.status == "completed":
-    st.subheader("Final medical orientation report")
-
     try:
         report = get_final_report()
-        st.text(report)
+
+        st.subheader(report["title"])
+
+        st.markdown("#### Initial case")
+        st.write(report["initial_case"])
+
+        summary = report["preliminary_summary"]
+
+        st.markdown("#### Preliminary clinical summary")
+        st.write(f"**Main complaint:** {summary['main_complaint']}")
+        st.write(f"**Duration:** {summary['duration']}")
+        st.write(f"**Severity:** {summary['severity'].title()}")
+
+        st.write("**Reported symptoms:**")
+        for symptom in summary["symptoms"]:
+            st.write(f"- {symptom}")
+
+        if summary["relevant_history"]:
+            st.write("**Relevant history:**")
+            for item in summary["relevant_history"]:
+                st.write(f"- {item}")
+
+        if summary["warning_signs"]:
+            st.error(
+                "Warning signs: "
+                + ", ".join(summary["warning_signs"])
+            )
+        else:
+            st.success("No warning signs were reported.")
+
+        st.write(
+            "**Preliminary orientation:** "
+            + summary["preliminary_orientation"]
+        )
+
+        interim_care = report["interim_care"]
+
+        st.markdown("#### Interim care recommendation")
+        st.write(
+            f"**Urgency:** {interim_care['urgency'].title()}"
+        )
+
+        for recommendation in interim_care["recommendations"]:
+            st.write(f"- {recommendation}")
+
+        st.markdown("#### Physician review")
+        st.write(
+            "**Recommended course of action:** "
+            + report["physician_recommendation"]
+        )
+        st.write(
+            "**Additional notes:** "
+            + (report["physician_notes"] or "None")
+        )
+
+        st.warning(report["disclaimer"])
+
     except httpx.HTTPError as error:
         st.error(f"Could not retrieve the report: {error}")
 

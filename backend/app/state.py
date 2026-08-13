@@ -26,4 +26,4 @@ class MedicalState(TypedDict, total = False):
     physician_treatment: str
     physician_notes: str
 
-    final_report: str
+    final_report: dict[str, object]

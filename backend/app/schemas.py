@@ -50,3 +50,12 @@ class PhysicianReviewInput(BaseModel):
 class ConsultationResumeRequest(BaseModel):
     thread_id: str
     response: str | PhysicianReviewInput
+
+class FinalReport(BaseModel):
+    title: str = "Final Medical Orientation Report"
+    initial_case: str
+    preliminary_summary: ClinicalSummary
+    interim_care: dict[str, object]
+    physician_recommendation: str
+    physician_notes: str
+    disclaimer: str

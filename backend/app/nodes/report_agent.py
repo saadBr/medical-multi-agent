@@ -1,21 +1,25 @@
+from backend.app.schemas import FinalReport
 from backend.app.state import MedicalState
+
 
 DISCLAIMER = "This system does not replace a medical consultation."
 
-def report_agent(state: MedicalState)-> dict:
-    """
-    Generate a temporary final report from the graph state.
-    """
 
-    final_report = (
-        "FINAL MEDICAL ORIENTATION REPORT\n\n"
-        f"Initial case: {state.get('initial_case', '')}\n\n"
-        f"Preliminary summary: {state.get('diagnostic_summary', '')}\n\n"
-        f"Interim care recommendation: {state.get('interim_care', {})}\n\n"
-        f"Physician recommendation: "
-        f"{state.get('physician_treatment', '')}\n\n"
-        f"Physician notes: {state.get('physician_notes', '')}\n\n"
-        f"{DISCLAIMER}"
+def report_agent(state: MedicalState) -> dict:
+    """Build the final structured medical-orientation report."""
+
+    report = FinalReport(
+        initial_case=state.get("initial_case", ""),
+        preliminary_summary=state["diagnostic_summary"],
+        interim_care=state["interim_care"],
+        physician_recommendation=state.get(
+            "physician_treatment",
+            "",
+        ),
+        physician_notes=state.get("physician_notes", ""),
+        disclaimer=DISCLAIMER,
     )
 
-    return {"final_report":final_report}
+    return {
+        "final_report": report.model_dump(),
+    }
