@@ -9,3 +9,6 @@ __pycache__/
 # IDE
 .vscode/
 .idea/
+
+# LangGraph local runtime
+.langgraph_api/

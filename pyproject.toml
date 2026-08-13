@@ -16,3 +16,8 @@ dependencies = [
     "streamlit>=1.61.1",
     "uvicorn[standard]>=0.52.1",
 ]
+
+[dependency-groups]
+dev = [
+    "langgraph-cli[inmem]>=0.4.31",
+]

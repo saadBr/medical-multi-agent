@@ -1,0 +1,6 @@
+{
+  "dependencies": ["."],
+  "graphs": {
+    "medical_workflow": "./backend/app/graph.py:studio_graph"
+  }
+}

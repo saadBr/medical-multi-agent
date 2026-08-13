@@ -43,3 +43,4 @@ workflow.add_edge("interim_care_agent", "supervisor")
 
 memory = InMemorySaver()
 graph = workflow.compile(checkpointer=memory)
+studio_graph = workflow.compile()
